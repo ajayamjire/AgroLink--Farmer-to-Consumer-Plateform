@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Product</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg custom-navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">🌾 AgroLink</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <div class="navbar-nav ms-auto nav-buttons">
+
+        <a href="/" class="nav-link">Home</a>
+
+        <% if (user) { %>
+          <span class="nav-user">Hi, <%= user.username %> (<%= user.role %>)</span>
+
+          <% if (user.role === "farmer") { %>
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/add" class="nav-link">Add Product</a>
+            <a href="/manage-orders" class="nav-link">Manage Orders</a>
+          <% } %>
+
+          <% if (user.role === "user") { %>
+            <a href="/orders" class="nav-link">My Orders</a>
+          <% } %>
+
+          <a href="/logout" class="nav-link logout-link">Logout</a>
+        <% } else { %>
+          <a href="/login" class="nav-link">Login</a>
+          <a href="/register" class="nav-link register-link">Register</a>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container">
+  <h2 class="text-center">Add Product</h2>
+
+  <form action="/add" method="POST" enctype="multipart/form-data" class="card p-4 shadow">
+    <input type="text" name="name" class="form-control mb-3" placeholder="Product Name" required>
+    <input type="number" name="price" class="form-control mb-3" placeholder="Price" required>
+    <input type="number" name="quantity" class="form-control mb-3" placeholder="Quantity" required>
+    <input type="file" name="image" class="form-control mb-3" required>
+    <button class="btn btn-success">Add Product</button>
+  </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

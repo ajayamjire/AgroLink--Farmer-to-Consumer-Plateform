@@ -1,0 +1,329 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg custom-navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">🌾 AgroLink</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <div class="navbar-nav ms-auto nav-buttons">
+
+        <a href="/" class="nav-link">Home</a>
+
+        <% if (user) { %>
+          <span class="nav-user">Hi, <%= user.username %> (<%= user.role %>)</span>
+
+          <% if (user.role === "farmer") { %>
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/add" class="nav-link">Add Product</a>
+            <a href="/manage-orders" class="nav-link">Manage Orders</a>
+          <% } %>
+
+          <% if (user.role === "user") { %>
+            <a href="/orders" class="nav-link">My Orders</a>
+          <% } %>
+
+          <a href="/logout" class="nav-link logout-link">Logout</a>
+        <% } else { %>
+          <a href="/login" class="nav-link">Login</a>
+          <a href="/register" class="nav-link register-link">Register</a>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container mt-5">
+  <div class="card p-4 shadow mx-auto" style="max-width:500px;">
+    <h3 class="text-center mb-4">Checkout</h3>
+
+    <h5><%= product.name %></h5>
+    <p>Price: ₹<%= product.price %></p>
+    <p>Farmer: <%= product.farmerName %></p>
+
+    <form action="/place-order/<%= product._id %>" method="POST">
+        <label class="form-label">Quantity</label>
+    <input 
+    type="number" 
+    name="quantity"
+    placeholder="Kg" 
+    class="form-control mb-3" 
+    min="1" 
+    max="<%= product.quantity %>" 
+    value="1" 
+    required
+    >
+      <label class="form-label">Delivery Address</label>
+<textarea 
+  name="deliveryAddress" 
+  class="form-control mb-3" 
+  placeholder="Enter full delivery address"
+  required></textarea>
+<input type="hidden" name="latitude" id="latitude">
+<input type="hidden" name="longitude" id="longitude">
+
+<button type="button" class="btn btn-outline-success mb-3" onclick="getLocation()">
+  Use My Current Location
+</button>
+
+<p id="locationText" class="text-muted"></p>
+<label class="form-label">Mobile Number</label>
+<input 
+  type="number" 
+  name="mobileNumber" 
+  class="form-control mb-3" 
+  placeholder="Enter mobile number" 
+  pattern="[0-9]{10}"
+  maxlength="10"
+  minlength="10"
+  required>
+    <p class="text-muted">Available Quantity: <%= product.quantity %>Kg</p>
+        <label class="form-label">Payment Method</label>
+
+      <select name="paymentMethod" class="form-control mb-3">
+        <option value="Cash on Delivery">Cash on Delivery</option>
+        <option value="UPI Payment">UPI Payment</option>
+      </select>
+      
+      <button class="btn btn-success w-100">Place Order</button>
+    </form>
+  </div>
+</div>
+    <script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      document.getElementById("latitude").value = position.coords.latitude;
+      document.getElementById("longitude").value = position.coords.longitude;
+      document.getElementById("locationText").innerText = "Location added successfully!";
+    });
+  } else {
+    alert("Geolocation not supported");
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container mt-5">
+  <div class="card p-4 shadow mx-auto" style="max-width:550px;">
+
+    <h3 class="text-center mb-4">🛒 Checkout</h3>
+
+    <h5><%= product.name %></h5>
+    <p>Price: ₹<%= product.price %></p>
+    <p>Available Quantity: <%= product.quantity %></p>
+    <p>Farmer: <%= product.farmerName %></p>
+
+    <form action="/place-order/<%= product._id %>" method="POST">
+
+      <label class="form-label">Quantity</label>
+      <input 
+        type="number"
+        name="quantity"
+        class="form-control mb-3"
+        min="1"
+        max="<%= product.quantity %>"
+        value="1"
+        required
+      >
+
+      <label class="form-label">Delivery Address</label>
+      <textarea 
+        name="deliveryAddress"
+        class="form-control mb-3"
+        placeholder="Enter full delivery address"
+        required></textarea>
+
+      <label class="form-label">Mobile Number</label>
+      <input 
+        type="tel"
+        name="mobileNumber"
+        class="form-control mb-3"
+        placeholder="Enter 10-digit mobile number"
+        pattern="[6-9][0-9]{9}"
+        maxlength="10"
+        minlength="10"
+        required
+      >
+
+      <input type="hidden" name="latitude" id="latitude">
+      <input type="hidden" name="longitude" id="longitude">
+
+      <button type="button" class="btn btn-outline-success w-100 mb-3" onclick="getLocation()">
+        📍 Use My Current Location
+      </button>
+
+      <p id="locationText" class="text-success"></p>
+
+      <label class="form-label">Payment Method</label>
+      <select name="paymentMethod" id="paymentMethod" class="form-control mb-3" required>
+        <option value="Cash on Delivery">Cash on Delivery</option>
+        <option value="UPI Payment">UPI Payment</option>
+      </select>
+
+      <div id="upiSection" style="display:none;" class="card p-3 text-center mb-3">
+
+        <h5>📱 Scan & Pay</h5>
+
+        <img 
+          src="/uploads/upi-qr.png.jpeg"
+          class="img-fluid mx-auto mb-3"
+          style="max-width:250px;"
+        >
+
+        <p class="text-success">
+          Scan QR using Google Pay / PhonePe / Paytm
+        </p>
+
+        <input 
+          type="text"
+          name="transactionId"
+          id="transactionId"
+          class="form-control mb-2"
+          placeholder="Enter UPI Transaction ID"
+        >
+        <button 
+  type="button"
+  class="btn btn-success w-100 mt-2"
+  id="verifyBtn"
+>
+  Verify Payment
+</button>
+        <small class="text-muted">
+          After payment, enter transaction ID and place order.
+        </small>
+
+      </div>
+        <div 
+      id="paymentSuccess"
+      class="alert alert-success mt-3"
+    style="display:none;"
+      >
+      ✅ Payment Successful
+      </div>
+      <button class="btn btn-success w-100">
+        Place Order
+      </button>
+        
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const paymentMethod = document.getElementById("paymentMethod");
+  const upiSection = document.getElementById("upiSection");
+  const transactionId = document.getElementById("transactionId");
+
+  paymentMethod.addEventListener("change", () => {
+    if (paymentMethod.value === "UPI Payment") {
+      upiSection.style.display = "block";
+      transactionId.required = true;
+    } else {
+      upiSection.style.display = "none";
+      transactionId.required = false;
+    }
+  });
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        document.getElementById("latitude").value = position.coords.latitude;
+        document.getElementById("longitude").value = position.coords.longitude;
+        document.getElementById("locationText").innerText = "Location added successfully!";
+      });
+    } else {
+      alert("Geolocation is not supported");
+    }
+  }
+</script>
+<!-- <script>
+
+const verifyBtn = document.getElementById("verifyBtn");
+const paymentSuccess = document.getElementById("paymentSuccess");
+// const transactionId = document.getElementById("transactionId");
+
+verifyBtn.addEventListener("click", () => {
+
+  if (transactionId.value.trim() === "") {
+
+    alert("Please enter Transaction ID");
+
+    return;
+  }
+
+  paymentSuccess.style.display = "block";
+
+});
+
+</script> -->
+<script>
+
+const verifyBtn = document.getElementById("verifyBtn");
+const paymentSuccess = document.getElementById("paymentSuccess");
+// const transactionId = document.getElementById("transactionId");
+
+verifyBtn.addEventListener("click", function () {
+
+  const txn = transactionId.value.trim();
+
+  // empty check
+  if (txn === "") {
+    alert("Please enter transaction ID");
+    return;
+  }
+
+  // minimum length
+  if (txn.length < 8) {
+    alert("Transaction ID must be at least 8 characters");
+    return;
+  }
+
+  // only letters + numbers
+  const regex = /^[A-Za-z0-9]+$/;
+
+  if (!regex.test(txn)) {
+    alert("Only letters and numbers allowed");
+    return;
+  }
+
+  // must start with TXN
+  if (!txn.startsWith("TXN")) {
+    alert("Transaction ID must start with TXN");
+    return;
+  }
+
+  // success
+  paymentSuccess.style.display = "block";
+
+});
+
+</script>
+</body>
+
+</html>

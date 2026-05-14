@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AgroLink</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+ 
+  <!-- TOAST -->
+
+<% if (success) { %>
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+
+  <div id="liveToast"
+       class="toast show align-items-center text-bg-success border-0"
+       role="alert">
+
+    <div class="d-flex">
+
+      <div class="toast-body">
+        <%= success %>
+      </div>
+
+      <button type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast">
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<% } %>
+
+<!-- 🌾 NAVBAR -->
+
+
+<nav class="navbar navbar-expand-lg custom-navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">🌾 AgroLink</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <div class="navbar-nav ms-auto nav-buttons">
+
+        <a href="/" class="nav-link">Home</a>
+
+        <% if (user) { %>
+          <span class="nav-user">Hi, <%= user.username %> (<%= user.role %>)</span>
+
+          <% if (user.role === "farmer") { %>
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/add" class="nav-link">Add Product</a>
+            <a href="/manage-orders" class="nav-link">Manage Orders</a>
+          <% } %>
+
+          <% if (user.role === "user") { %>
+            <a href="/orders" class="nav-link">My Orders</a>
+          <% } %>
+
+          <a href="/logout" class="nav-link logout-link">Logout</a>
+        <% } else { %>
+          <a href="/login" class="nav-link">Login</a>
+          <a href="/register" class="nav-link register-link">Register</a>
+        <% } %>
+            <% if (user && user.role === "admin") { %>
+
+            <a href="/admin" class="nav-link">
+              Admin Panel
+            </a>
+
+            <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- 🌾 TITLE -->
+<h1 class="text-center mt-3">🌾 AgroLink Marketplace</h1>
+
+<!-- 🛍️ PRODUCTS -->
+<div class="container mt-4">
+  <!-- 🔍 SEARCH BAR -->
+
+<!-- <form action="/" method="GET" class="d-flex mb-4">
+
+  <input 
+    type="text"
+    name="search"
+    class="form-control me-2"
+    placeholder="Search products..."
+    value="<%= search %>"
+  >
+
+  <button class="btn btn-success">
+    Search
+  </button>
+  <% if (products.length === 0) { %>
+    <h4 class="text-center text-danger">
+      No products found
+    </h4>
+  <% } %>
+  
+</form> -->
+
+<form action="/" method="GET" class="d-flex mb-4" id="searchForm">
+
+  <input 
+    type="text"
+    name="search"
+    id="searchInput"
+    class="form-control me-2"
+    placeholder="Search products..."
+    value="<%= search || '' %>"
+  >
+
+  <button 
+    type="button"
+    class="btn btn-success me-2"
+    onclick="startVoiceAssistant()">
+    <i class="fa-solid fa-microphone"></i>
+  </button>
+
+  <button type="submit" class="btn btn-dark">
+    Search
+  </button>
+
+</form>
+<script>
+function startVoiceAssistant() {
+  const status = document.getElementById("voiceStatus");
+  const input = document.getElementById("searchInput");
+  const form = document.getElementById("searchForm");
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Voice search is not supported in this browser. Please use Google Chrome.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  status.innerText = "Listening... please speak product name";
+
+  recognition.start();
+
+  recognition.onresult = function(event) {
+    const voiceText = event.results[0][0].transcript;
+
+    input.value = voiceText;
+    status.innerText = "You said: " + voiceText;
+
+    setTimeout(() => {
+      form.submit();
+    }, 800);
+  };
+
+  recognition.onerror = function(event) {
+    status.innerText = "Voice error: " + event.error;
+  };
+
+  recognition.onend = function() {
+    if (status.innerText === "Listening... please speak product name") {
+      status.innerText = "Voice stopped. Try again.";
+    }
+  };
+}
+</script>
+<p id="voiceStatus" class="text-muted"></p>
+  <h2 class="text-center mb-4">Available Products</h2>
+
+  <div class="row">
+
+    <% products.forEach(p => { %>
+
+      <div class="col-md-4">
+        <div class="card p-3 mb-4 shadow">
+
+          <!-- Image -->
+          <img src="/uploads/<%= p.image %>" 
+               class="img-fluid mb-3"
+               style="height:200px; object-fit:cover; border-radius:10px;">
+
+          <!-- Product Info -->
+          <h5><%= p.name %></h5>
+          <p>
+            ⭐ <%= p.averageRating ? p.averageRating.toFixed(1) : "0.0" %>
+            (<%= p.reviews.length %> reviews)
+          </p>
+          <p>Price: ₹<%= p.price %>/kg</p>
+          <p>Qty: <%= p.quantity %> Kg</p>
+
+          <% if (p.quantity <= 0) { %>
+            <span class="badge bg-danger mb-2">
+             Out of Stock
+            </span>
+          <% } %>
+
+          <p class="text-muted">👨‍🌾 Farmer: <%= p.farmerName %></p>
+          <!-- 🧑 USER → BUY -->
+          <% if (user && user.role === "user") { %>
+            <!-- <a href="/buy/<%= p._id %>" class="btn btn-success">Buy Now</a> -->
+
+            <% if (p.quantity > 0) { %>
+
+             <a href="/buy/<%= p._id %>" class="btn btn-success">
+                Buy Now
+              </a>
+
+            <% } else { %>
+
+              <button class="btn btn-secondary" disabled>
+               Out of Stock
+              </button>
+
+              <% } %>
+            <% } %>
+            <% if (user && user.role === "user") { %>
+  <form action="/review/<%= p._id %>" method="POST" class="mt-3">
+
+    <select name="rating" class="form-control mb-2" required>
+      <option value="">Select Rating</option>
+      <option value="5">⭐⭐⭐⭐⭐ 5</option>
+      <option value="4">⭐⭐⭐⭐ 4</option>
+      <option value="3">⭐⭐⭐ 3</option>
+      <option value="2">⭐⭐ 2</option>
+      <option value="1">⭐ 1</option>
+    </select>
+
+    <input 
+      type="text" 
+      name="comment" 
+      class="form-control mb-2" 
+      placeholder="Write review"
+      required
+    >
+
+    <button class="btn btn-outline-success btn-sm w-100">
+      Submit Review
+    </button>
+
+  </form>
+   <% if (p.reviews && p.reviews.length > 0) { %>
+  <div class="mt-2">
+    <small class="text-muted">Latest Review:</small>
+    <p class="small">
+      "<%= p.reviews[p.reviews.length - 1].comment %>"
+      - <%= p.reviews[p.reviews.length - 1].username %>
+    </p>
+  </div>
+<% } %>
+<% } %>
+          <!-- 👨‍🌾 FARMER → DELETE -->
+          <% if (user && user.role === "farmer") { %>
+            <a href="/delete/<%= p._id %>" 
+               class="btn btn-danger mt-2"
+               onclick="return confirm('Are you sure?')">
+               Delete
+            </a>
+          <% } %>
+
+        </div>
+       
+      </div>
+
+    <% }) %>
+
+  </div>
+
+</div>
+<!-- CHAT BUTTON -->
+
+<button id="chatBtn">💬</button>
+
+<div id="chatBox">
+
+  <div id="chatHeader">
+    Agro AI Assistant
+  </div>
+
+  <div id="chatMessages"></div>
+
+  <div class="d-flex">
+    <input type="text" id="userInput" placeholder="Ask something...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+</div>
+
+<script>
+
+const chatBtn = document.getElementById("chatBtn");
+const chatBox = document.getElementById("chatBox");
+
+chatBtn.onclick = () => {
+  chatBox.style.display =
+    chatBox.style.display === "block"
+    ? "none"
+    : "block";
+};
+
+function sendMessage() {
+
+  let input = document.getElementById("userInput");
+  let msg = input.value.toLowerCase();
+
+  let messages = document.getElementById("chatMessages");
+
+  messages.innerHTML += `
+    <div><b>You:</b> ${msg}</div>
+  `;
+
+  let reply = "Sorry, I don't understand.";
+
+  // AI responses
+
+  if (msg.includes("hello")) {
+    reply = "Hello 👋 Welcome to AgroLink!";
+  }
+
+  else if (msg.includes("fertilizer")) {
+    reply = "Organic fertilizer is recommended for healthy crops 🌱";
+  }
+
+  else if (msg.includes("payment")) {
+    reply = "We support UPI and Cash on Delivery 💳";
+  }
+
+  else if (msg.includes("delivery")) {
+    reply = "You can track delivery in Orders section 🚚";
+  }
+
+  else if (msg.includes("crop")) {
+    reply = "Rice, wheat and tomato are popular crops 🌾";
+  }
+
+  messages.innerHTML += `
+    <div class="mt-2 text-success">
+      <b>Bot:</b> ${reply}
+    </div>
+  `;
+
+  input.value = "";
+
+  messages.scrollTop = messages.scrollHeight;
+}
+
+</script>
+
+<!-- FOOTER -->
+
+<footer class="footer mt-5">
+
+  <div class="container">
+
+    <div class="row">
+
+      <!-- About -->
+
+      <div class="col-md-4 mb-3">
+        <h5>🌾 AgroLink</h5>
+
+        <p>
+          Connecting farmers directly with consumers through a smart digital marketplace.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+
+      <div class="col-md-4 mb-3">
+
+        <h5>Quick Links</h5>
+
+        <ul class="list-unstyled">
+
+          <li><a href="/">Home</a></li>
+
+          <% if (user && user.role === "farmer") { %>
+            <li><a href="/dashboard">Dashboard</a></li>
+          <% } %>
+
+          <% if (user && user.role === "user") { %>
+            <li><a href="/orders">My Orders</a></li>
+          <% } %>
+
+          <li><a href="/login">Login</a></li>
+
+        </ul>
+      </div>
+
+      <!-- Contact -->
+
+      <div class="col-md-4 mb-3">
+
+        <h5>Contact</h5>
+
+        <p>📍 India</p>
+        <p>📧 agrolink@gmail.com</p>
+        <p>📞 +91 9876543210</p>
+
+      </div>
+
+    </div>
+
+    <hr>
+
+    <p class="text-center mb-0">
+      © 2026 AgroLink. All Rights Reserved.
+    </p>
+
+  </div>
+
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
